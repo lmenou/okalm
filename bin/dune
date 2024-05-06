@@ -1,0 +1,4 @@
+(executable
+ (public_name okalm)
+ (name main)
+ (libraries okalm cmdliner))
