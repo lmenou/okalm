@@ -4,13 +4,15 @@ synopsis: "Encrypt your files, the ML way"
 description: "A cli to encrypt your files"
 maintainer: ["lmenou"]
 authors: ["lmenou"]
-license: "LICENSE"
+license: "GPL-3.0-or-later"
 homepage: "https://github.com/lmenou/okalm"
 bug-reports: "https://github.com/lmenou/okalm/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.15"}
   "cmdliner"
+  "cryptokit"
+  "safepass"
   "alcotest" {with-test}
   "ocaml-lsp-server" {build}
   "ocamlformat" {build}
