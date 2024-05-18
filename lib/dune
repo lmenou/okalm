@@ -1,2 +1,4 @@
 (library
- (name okalm))
+ (public_name okalm)
+ (name okalm)
+ (libraries unix safepass))

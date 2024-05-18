@@ -1,7 +1,6 @@
 open Cmdliner
 
-let crypter file = Printf.printf "%s\n" file
-let file = Arg.(required & pos 0 (some file) None & info [] ~docv:"FILE")
+let file = Arg.(required & pos 0 (some string) None & info [] ~docv:"STRING")
 
 let cmd =
   let doc = "Encrypt files or directories" in
@@ -15,7 +14,7 @@ let cmd =
     ]
   in
   let info = Cmd.info "okalm" ~version:"%%VERSION%%" ~doc ~man in
-  Cmd.v info Term.(const crypter $ file)
+  Cmd.v info Term.(const Okalm.Lib.Crypter.crypter $ file)
 
 let main () = exit (Cmd.eval cmd)
 let () = main ()
