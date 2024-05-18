@@ -11,7 +11,7 @@
 
 (maintainers "lmenou")
 
-(license LICENSE)
+(license "GPL-3.0-or-later")
 
 (package
  (name okalm)
