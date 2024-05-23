@@ -1,6 +1,6 @@
 open Cmdliner
 
-let file = Arg.(required & pos 0 (some string) None & info [] ~docv:"STRING")
+let file = Arg.(required & pos 0 (some file) None & info [] ~docv:"FILE")
 
 let cmd =
   let doc = "Encrypt files or directories" in
@@ -14,7 +14,7 @@ let cmd =
     ]
   in
   let info = Cmd.info "okalm" ~version:"%%VERSION%%" ~doc ~man in
-  Cmd.v info Term.(const Okalm.Lib.Crypter.crypter $ file)
+  Cmd.v info Term.(const Okalm.Crypter.crypter $ file)
 
 let main () = exit (Cmd.eval cmd)
 let () = main ()
