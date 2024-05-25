@@ -12,6 +12,6 @@ let read_pass () =
   tty_set_echo_to true;
   pass
 
-let getpass message =
-  print_endline message;
+let getpass ~prompt_message =
+  print_endline prompt_message;
   read_pass ()

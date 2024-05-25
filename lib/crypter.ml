@@ -9,5 +9,5 @@ let is_host_windows () =
 
 let crypter file =
   if is_host_windows () then () else print_endline file;
-  let pass = Getpass.getpass "Please enter your password:" in
+  let pass = Getpass.getpass ~prompt_message:"Please enter your password:" in
   Keys.use pass
