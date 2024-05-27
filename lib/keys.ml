@@ -1,37 +1,51 @@
-module Utils : sig
-  exception OkalmError of string
-
-  val make_data_home : unit -> unit
+module OkalmDataHome : sig
+  val get : unit -> string
 end = struct
-  exception OkalmError of string
-
-  let xdg_config_data env_variable =
-    let module F = Filename in
-    match env_variable with
-    | Some data_dir -> F.concat data_dir "okalm"
-    | None ->
-        let home = Sys.getenv "HOME" in
-        let root =
-          let rec concat folders =
-            match folders with [] -> "" | hd :: tl -> F.concat hd (concat tl)
-          in
-          concat [ home; ".local"; "share" ]
-        in
-        if Sys.is_directory root then F.concat root "okalm"
-        else raise (OkalmError "cli is not used by a standard user")
-
-  let make_data_home () =
-    let path =
-      try Sys.getenv "XDG_DATA_HOME" with
-      | Not_found -> xdg_config_data None
-      | _ -> xdg_config_data (Some (Sys.getenv "XDG_DATA_HOME"))
-    in
+  let standard_location =
     try
-      if Sys.is_directory path then ()
-      else raise (OkalmError "$XDG_DATA_HOME/okalm is not a directory?")
-    with Sys_error _ -> Unix.mkdir path 0o700
+      let home = Sys.getenv "HOME" in
+      let module F = Filename in
+      let rec concat folders =
+        match folders with [] -> "" | hd :: tl -> F.concat hd (concat tl)
+      in
+      let no_user_error =
+        Errors.OkalmError "Not in a standard user environment, aborting"
+      in
+      let standard = concat [ home; ".local"; "share" ] in
+      try
+        if Sys.is_directory standard then F.concat standard "okalm"
+        else raise no_user_error
+      with Sys_error _ -> raise no_user_error
+    with Not_found -> raise (Errors.OkalmError "No $HOME, aborting")
+
+  let okalm_data_home =
+    try
+      let config = Sys.getenv "XDG_DATA_HOME" in
+      let module F = Filename in
+      F.concat config "okalm"
+    with Not_found -> standard_location
+
+  let get () =
+    try
+      if Sys.is_directory okalm_data_home then okalm_data_home
+      else
+        raise
+          (Errors.OkalmError "No okalm directory in $XDG_DATA_HOME, aborting")
+    with Sys_error _ ->
+      Unix.mkdir okalm_data_home 0o700;
+      okalm_data_home
 end
 
-let use pass =
-  print_endline pass;
-  Utils.make_data_home ()
+let make_double_hash ~password =
+  let module B = Bcrypt in
+  let hash text = B.string_of_hash @@ B.hash text in
+  let rec hash_twice ?(times = 2) pass =
+    if times = 0 then pass else hash_twice ~times:(times - 1) (hash pass)
+  in
+  hash_twice password
+
+let use ~password =
+  print_endline password;
+  let home = OkalmDataHome.get () in
+  print_endline @@ make_double_hash ~password;
+  print_endline home
