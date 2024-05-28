@@ -36,6 +36,16 @@ end = struct
       okalm_data_home
 end
 
+module OkalmPassFile : sig
+  val store : filepath:string -> text:string -> unit
+end = struct
+  let store ~filepath ~text =
+    let module O = Out_channel in
+    let module F = Filename in
+    O.with_open_text (F.concat filepath "keypass") (fun oc ->
+        output_string oc text)
+end
+
 let make_double_hash ~password =
   let module B = Bcrypt in
   let hash text = B.string_of_hash @@ B.hash text in
@@ -45,7 +55,6 @@ let make_double_hash ~password =
   hash_twice password
 
 let use ~password =
-  print_endline password;
   let home = OkalmDataHome.get () in
-  print_endline @@ make_double_hash ~password;
-  print_endline home
+  let hash = make_double_hash ~password in
+  OkalmPassFile.store ~filepath:home ~text:hash

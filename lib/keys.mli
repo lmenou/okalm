@@ -10,3 +10,9 @@ module OkalmDataHome : sig
   val get : unit -> string
   (** Return the expanded $XDG_DATA_HOME/okalm *)
 end
+
+(** Module defining utility to store the cryptographic key *)
+module OkalmPassFile : sig
+  val store : filepath:string -> text:string -> unit
+  (** Store the text written cryptographic key in a file located at filepath *)
+end
