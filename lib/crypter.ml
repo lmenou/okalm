@@ -10,4 +10,5 @@ let is_host_windows () =
 let crypter file =
   if is_host_windows () then () else print_endline file;
   let pass = Getpass.getpass ~prompt_message:"Please enter your password:" in
-  Keys.use ~password:pass
+  Keys.use ~password:pass;
+  print_endline @@ Bytes.to_string (Keygen.get ())
