@@ -12,12 +12,12 @@ depends: [
   "dune" {>= "3.15"}
   "cmdliner"
   "cryptokit"
-  "safepass"
   "ocaml-lsp-server" {build}
   "ocamlformat" {build}
   "utop" {build}
   "alcotest" {with-test}
   "odoc" {with-doc}
+  "odig" {with-doc}
 ]
 build: [
   ["dune" "subst"] {dev}

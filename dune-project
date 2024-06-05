@@ -22,11 +22,11 @@
    dune
    cmdliner
    cryptokit
-   safepass
    (ocaml-lsp-server :build)
    (ocamlformat :build)
    (utop :build)
    (alcotest :with-test)
-   (odoc :with-doc)))
+   (odoc :with-doc)
+   (odig :with-doc)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
