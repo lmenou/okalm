@@ -1,14 +1,14 @@
 (** Module generating a random key for the encryption *)
 
-type key
+type salt = Salt of bytes | Null
 (** Define the type of key *)
 
-module KeyStore : Store.Storage
+module SaltStore : Store.Storage
 (** Name of the file in the store *)
 
-val string_of_key : key -> string
+val string_of_key : salt -> string
 (** Return the key as a string *)
 
-val get : unit -> key
+val get : unit -> salt
 (** Generate the random byte sequence as the key, the key is composed of ASCII
     character only and is of size 256 bits  *)

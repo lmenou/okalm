@@ -6,10 +6,10 @@ let crypter file =
   else
     let _ = print_endline file in
     let pass = Pass.getpass ~prompt_message:"Please enter your password:" in
-    let salt = Keygen.get () in
+    let salt = Salt.get () in
     let key =
       Okcrypt.Pbkdf.pbkdf2
-        ~salt:(Keygen.string_of_key salt)
+        ~salt:(Salt.string_of_key salt)
         ~keylen:32 ~hash:Sha256
         (Pass.string_of_password pass)
     in
