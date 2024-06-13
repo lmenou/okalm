@@ -5,5 +5,11 @@ let crypter file =
        bugs; hence aborting cowardly"
   else
     let pass = Pass.getpass ~prompt_message:"Please enter your password:" in
-    if Pass.exist () then print_endline file
+    if Pass.exist () then
+      let _ = print_endline file in
+      let res =
+        Okcrypt.Pbkdf.pbkdf2 ~salt:"coucou" ~keylen:32 ~hash:Sha256
+          (Pass.string_of_password pass)
+      in
+      print_endline res
     else Pass.(store (string_of_password pass))
