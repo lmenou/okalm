@@ -12,7 +12,7 @@ module Rtty = struct
       let termio = U.tcgetattr fd in
       let ntermio = { termio with c_echo = value } in
       U.tcsetattr fd U.TCSADRAIN ntermio
-    else raise (Exn.OkalmExn "Not a valid tty\n")
+    else raise (Exn.OkalmExn "Not a valid tty")
 
   let read_pass () =
     try

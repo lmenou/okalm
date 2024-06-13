@@ -36,7 +36,7 @@ let rec f ?(tcat = "") ~prf ~salt ~xor_iterations ~tot_blocks blocki =
         xor xor_chained u
     | iter when iter = 1 ->
         let u = hashing previous_u in
-        xoring ~xor_chained:u1 u (iter + 1)
+        xoring ~xor_chained:previous_u u (iter + 1)
     | iter ->
         let u = hashing previous_u in
         xoring u ~xor_chained:(xor xor_chained u) (iter + 1)
