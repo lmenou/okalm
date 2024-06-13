@@ -1,4 +1,5 @@
 type hash = Sha256 | Sha512
+type key = Key of string | Null  (** Key type representation *)
 
 (** Compute the big endian representatoin of an int [value] *)
 let big_endian_int32 value =
@@ -59,4 +60,4 @@ let pbkdf2 ?(xor_iterations = 1000) ?(keylen = 32) ?(hash = Sha256) ~salt s =
         (prf, size)
   in
   let tot_blocks = (keylen + hlen - 1) / hlen in
-  f ~prf ~salt ~xor_iterations ~tot_blocks 1
+  Key (f ~prf ~salt ~xor_iterations ~tot_blocks 1)
