@@ -22,6 +22,7 @@
    dune
    cmdliner
    cryptokit
+   progress
    (ocaml-lsp-server :build)
    (ocamlformat :build)
    (utop :build)
