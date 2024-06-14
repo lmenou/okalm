@@ -39,13 +39,17 @@ let decryption () =
     let k1s = Store.unstore "k1s" in
     let k1 = decrypt_k1 k1s (Keys.string_of_key k2) iv in
     print_endline k1
-  else print_endline "problem"
+  else
+    Printf.eprintf "%s"
+      "Problem: Your password may be wrong or someone tampered with your files!\n\
+       Stopping here.\n"
 
 let crypter file =
-  let _ = print_endline file in
+  let filesize = (Unix.LargeFile.stat file).st_size in
+  let _ = print_endline (Int64.to_string filesize) in
   if Sys.win32 || Sys.cygwin then
-    print_endline
-      "Warning: the CLI is not tested on Windows, you may experience violent  \
-       bugs; hence aborting cowardly"
+    Printf.eprintf "%s"
+      "Warning: the CLI is not tested on Windows, you may experience violent\n\
+       bugs; hence aborting cowardly.\n"
   else if not (Store.exist "iv") then setup ()
   else decryption ()
