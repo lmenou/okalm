@@ -32,48 +32,33 @@ end = struct
   let get () =
     try
       if Sys.is_directory okalm_data_home then okalm_data_home
-      else
-        raise
-          (Exn.OkalmExn "No okalm directory in $XDG_DATA_HOME, aborting")
+      else raise (Exn.OkalmExn "No okalm directory in $XDG_DATA_HOME, aborting")
     with Sys_error _ ->
       Unix.mkdir okalm_data_home 0o700;
       okalm_data_home
 end
 
-module type Storage = sig
-  val filename : string
-end
+let store filename elem =
+  let module O = Out_channel in
+  let module F = Filename in
+  let dest = OkalmDataHome.get () in
+  let write filename text =
+    O.with_open_text (F.concat dest filename) (fun oc -> output_string oc text)
+  in
+  write filename elem
 
-module type Storer = sig
-  val store : string -> unit
-  val unstore : unit -> string
-  val exist : unit -> bool
-end
+let exist filename =
+  let module F = Filename in
+  let dest = OkalmDataHome.get () in
+  let filename = filename in
+  try
+    let result = Sys.is_regular_file (F.concat dest filename) in
+    result
+  with Sys_error _ -> false
 
-module Make (S : Storage) : Storer = struct
-  let store elem =
-    let module O = Out_channel in
-    let module F = Filename in
-    let dest = OkalmDataHome.get () in
-    let write filename text =
-      O.with_open_text (F.concat dest filename) (fun oc ->
-          output_string oc text)
-    in
-    write S.filename elem
-
-  let exist () =
-    let module F = Filename in
-    let dest = OkalmDataHome.get () in
-    let filename = S.filename in
-    try
-      let result = Sys.is_regular_file (F.concat dest filename) in
-      result
-    with Sys_error _ -> false
-
-  let unstore () =
-    let module I = In_channel in
-    let module F = Filename in
-    let dest = OkalmDataHome.get () in
-    let read filename = I.with_open_text (F.concat dest filename) input_line in
-    read S.filename
-end
+let unstore filename =
+  let module I = In_channel in
+  let module F = Filename in
+  let dest = OkalmDataHome.get () in
+  let read filename = I.with_open_text (F.concat dest filename) input_line in
+  read filename

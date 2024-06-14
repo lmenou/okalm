@@ -1,7 +1,3 @@
-module PassStore : Store.Storage = struct
-  let filename = "keypass"
-end
-
 type password = Password of string | Null
 
 module Rtty = struct
@@ -33,9 +29,3 @@ let getpass ~prompt_message =
 let string_of_password = function
   | Password pass -> pass
   | Null -> raise (Exn.OkalmExn "password is empty!")
-
-module Ps = Store.Make (PassStore)
-
-let exist = Ps.exist
-let store = Ps.store
-let unstore = Ps.unstore
