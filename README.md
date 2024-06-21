@@ -1,0 +1,3 @@
+# Okalm
+
+Try to learn Ocaml...
