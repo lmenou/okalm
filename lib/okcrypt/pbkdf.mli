@@ -1,6 +1,7 @@
 (** Define PBKDF2 hash algorithm *)
 
-type hash = Sha256 | Sha512  (** Type representing hashing *)
+(** Type representing hashing *)
+type hash = Sha256 | Sha512
 
 val pbkdf2 :
   ?xor_iterations:int ->
