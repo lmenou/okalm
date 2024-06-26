@@ -39,37 +39,17 @@ let decryption () =
     in
     raise (Exn.OkalmExn "Could not decrypt the first key for file decryption.")
 
-let write filename content =
-  let module O = Out_channel in
-  O.with_open_text filename (fun oc -> output_string oc content)
-
-let read filename =
-  let module I = In_channel in
-  I.with_open_text filename input_line
-
-let encrypt file key iv =
-  let filesize = (Unix.LargeFile.stat file).st_size in
-  if filesize > Int64.of_int 70 then print_endline "not now"
-  else
-    let to_encrypt = read file in
-    let aest = Cryptokit.AEAD.aes_gcm ~iv (Keys.string_of_key key) Encrypt in
-    let _ = aest#put_string to_encrypt in
-    let _ = aest#finish_and_get_tag in
-    write file aest#get_string
-
 (* Main function *)
 let crypter file =
-  let filesize = (Unix.LargeFile.stat file).st_size in
-  let _ = print_endline (Int64.to_string filesize) in
   if Sys.win32 || Sys.cygwin then
     Printf.eprintf "%s"
       "Warning: the CLI is not tested on Windows, you may experience violent\n\
        bugs; hence aborting cowardly.\n"
   else if not (Store.exist "iv") then
     let k1, iv = setup () in
-    encrypt file k1 iv
+    Encwrite.crypt file k1 iv
   else
     try
       let k1, iv = decryption () in
-      encrypt file k1 iv
+      Encwrite.crypt file k1 iv
     with Exn.OkalmExn value -> print_endline value
