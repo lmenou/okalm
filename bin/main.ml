@@ -10,7 +10,7 @@ let cmd =
       `P
         "$(tname) encrypt each specified $(i,FILE). By default it does not\n\
          encrypt directories, to also encrypt them and their contents, use the\n\
-         option $(b,--recursive) ($(b,-r) or $(b,-R)).";
+         option $(b,--zip) ($(b,-z)).";
     ]
   in
   let info = Cmd.info "okalm" ~version:"%%VERSION%%" ~doc ~man in

@@ -39,7 +39,6 @@ let decryption () =
     in
     raise (Exn.OkalmExn "Could not decrypt the first key for file decryption.")
 
-(* Main function *)
 let crypter file =
   if Sys.win32 || Sys.cygwin then
     Printf.eprintf "%s"
