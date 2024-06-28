@@ -19,31 +19,38 @@ let encrypt content key iv =
   let _ = aest#finish_and_get_tag in
   aest#get_string
 
+(** [post_filename file] rename [file] to [file.okalm] if encryption, remove "okalm" otherwise *)
+let post_filename file =
+  let module F = Filename in
+  if F.check_suffix file "okalm" then F.chop_suffix file ".okalm"
+  else file ^ ".okalm"
+
 let encryptf file key iv =
   let module I = In_channel in
   let module O = Out_channel in
-  let rec crypting ic oc key iv pos =
-    let filesize = (Unix.LargeFile.stat file).st_size in
-    if Int64.add pos max_size >= filesize then
-      let maxb = Int64.to_int @@ Int64.sub filesize pos in
-      let _ = I.seek ic pos in
-      let buffer = Bytes.create maxb in
-      let _ = I.input ic buffer 0 maxb in
-      let to_write = encrypt (Bytes.to_string buffer) key iv in
-      let _ = O.output_string oc to_write in
-      let _ = I.close ic in
-      O.close oc
-    else
-      let buffer = Bytes.create step in
-      let _ = I.seek ic pos in
-      let _ = I.input ic buffer 0 step in
-      let to_write = encrypt (Bytes.to_string buffer) key iv in
-      let _ = O.output_string oc to_write in
-      crypting ic oc key iv (Int64.add pos max_size)
-  in
-  let ic = I.open_bin file in
-  let oc = O.open_gen [ Open_creat; Open_append ] 0o644 "coucou" in
-  crypting ic oc key iv (Int64.of_int 0)
+  let nfile = post_filename file in
+  let filesize = (Unix.LargeFile.stat file).st_size in
+  I.with_open_bin file (fun ic ->
+      O.with_open_gen [ Open_creat; Open_append ] 0o644 nfile (fun oc ->
+          let encwrite pos_from_ic bufsize_from_ic =
+            let buffer = Bytes.create bufsize_from_ic in
+            let _ = I.seek ic pos_from_ic in
+            let _ = I.input ic buffer 0 bufsize_from_ic in
+            let to_write = encrypt (Bytes.to_string buffer) key iv in
+            let _ = O.output_string oc to_write in
+            Int64.add pos_from_ic (Int64.of_int bufsize_from_ic)
+          in
+          let rec crypting at_pos =
+            if Int64.add at_pos max_size >= filesize then
+              let bufsize = Int64.to_int @@ Int64.sub filesize at_pos in
+              let _ = encwrite at_pos bufsize in
+              Unix.unlink file
+            else
+              let bufsize = step in
+              let npos = encwrite at_pos bufsize in
+              crypting npos
+          in
+          crypting (Int64.of_int 0)))
 
 let crypt file key iv =
   let filesize = (Unix.LargeFile.stat file).st_size in
