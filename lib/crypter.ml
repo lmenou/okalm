@@ -11,8 +11,8 @@ let setup () =
   let k1e = Keys.aes_encrypt_key k1 k2 iv in
   let _ =
     Store.store
-      [ "k1s"; "k3"; "salt"; "iv" ]
-      [ Store.Stock k1e; Store.Key k3; Store.Stock salt; Store.Stock iv ]
+      [ "k1e"; "k3"; "salt"; "iv" ]
+      [ Store.Key k1e; Store.Key k3; Store.Stock salt; Store.Stock iv ]
   in
   (k1, iv)
 
@@ -27,8 +27,8 @@ let decryption () =
   let k2, k3 = Keys.gen encrypted_password in
   let k3s = Store.unstore "k3" in
   if String.equal (Keys.string_of_key k3) k3s then
-    let k1s = Store.unstore "k1s" in
-    let k1 = Keys.aes_decrypt_key k1s k2 iv in
+    let k1e = Store.unstore "k1e" in
+    let k1 = Keys.aes_decrypt_key k1e k2 iv in
     (k1, iv)
   else
     let _ =
