@@ -32,13 +32,13 @@ let encryptf file key iv =
   let filesize = (Unix.LargeFile.stat file).st_size in
   I.with_open_bin file (fun ic ->
       O.with_open_gen [ Open_creat; Open_append ] 0o644 nfile (fun oc ->
-          let encwrite pos_from_ic bufsize_from_ic =
+          let encwrite pos_at_ic bufsize_from_ic =
             let buffer = Bytes.create bufsize_from_ic in
-            let _ = I.seek ic pos_from_ic in
+            let _ = I.seek ic pos_at_ic in
             let _ = I.input ic buffer 0 bufsize_from_ic in
             let to_write = encrypt (Bytes.to_string buffer) key iv in
             let _ = O.output_string oc to_write in
-            Int64.add pos_from_ic (Int64.of_int bufsize_from_ic)
+            Int64.add pos_at_ic (Int64.of_int bufsize_from_ic)
           in
           let rec crypting at_pos =
             if Int64.add at_pos max_size >= filesize then
