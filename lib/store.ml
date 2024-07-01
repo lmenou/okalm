@@ -38,22 +38,14 @@ end = struct
       okalm_data_home
 end
 
-type t = Key of Keys.key | Stock of string
-
-let store filenames elems =
-  let s filename elem =
-    let module O = Out_channel in
-    let module F = Filename in
-    let dest = OkalmDataHome.get () in
-    let write filename text =
-      O.with_open_text (F.concat dest filename) (fun oc ->
-          output_string oc text)
-    in
-    match elem with
-    | Key value -> write filename (Keys.string_of_key value)
-    | Stock value -> write filename value
+let store filename stored =
+  let module O = Out_channel in
+  let module F = Filename in
+  let dest = OkalmDataHome.get () in
+  let write filename text =
+    O.with_open_text (F.concat dest filename) (fun oc -> output_string oc text)
   in
-  List.map2 s filenames elems
+  write filename stored
 
 let exist filename =
   let module F = Filename in

@@ -9,11 +9,9 @@ let setup () =
   let k2, k3 = Keys.gen encrypted_password in
   let k1 = Keys.rand 32 in
   let k1e = Keys.aes_encrypt_key k1 k2 iv in
-  let _ =
-    Store.store
-      [ "k1e"; "k3"; "salt"; "iv" ]
-      [ Store.Key k1e; Store.Key k3; Store.Stock salt; Store.Stock iv ]
-  in
+  let filenames = [ "k1e"; "k3"; "salt"; "iv" ] in
+  let elems = [ k1e; Keys.string_of_key k3; salt; iv ] in
+  let _ = List.map2 Store.store filenames elems in
   (k1, iv)
 
 (** Decrypt keys from the storage *)

@@ -11,14 +11,6 @@ let read filename =
   let module I = In_channel in
   I.with_open_text filename input_line
 
-(** Encryption unit generator, [encrypt content key iv] encrypt the [content]
-provided with the [key] and initial vector [iv] *)
-let encrypt content key iv =
-  let aest = Cryptokit.AEAD.aes_gcm ~iv (Keys.string_of_key key) Encrypt in
-  let _ = aest#put_string content in
-  let _ = aest#finish_and_get_tag in
-  aest#get_string
-
 (** [post_filename file] rename [file] to [file.okalm] if encryption, remove "okalm" otherwise *)
 let post_filename file =
   let module F = Filename in
@@ -36,7 +28,7 @@ let encryptf file key iv =
             let buffer = Bytes.create bufsize_from_ic in
             let _ = I.seek ic pos_at_ic in
             let _ = I.input ic buffer 0 bufsize_from_ic in
-            let to_write = encrypt (Bytes.to_string buffer) key iv in
+            let to_write = Keys.Crypt.encrypt (Bytes.to_string buffer) key iv in
             let _ = O.output_string oc to_write in
             Int64.add pos_at_ic (Int64.of_int bufsize_from_ic)
           in
@@ -57,5 +49,5 @@ let crypt file key iv =
   if filesize > max_size then encryptf file key iv
   else
     let content = read file in
-    let result = encrypt content key iv in
+    let result = Keys.Crypt.encrypt content key iv in
     write file result
