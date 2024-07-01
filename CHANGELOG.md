@@ -1,3 +1,18 @@
+## 0.0.3 (2024-07-01)
+
+### Feat
+
+- encrypt larger file
+- add LICENSE
+
+### Refactor
+
+- simplify types management
+- redefine properly keys
+- use wrapper "with..." to encrypt files
+- split concerns to handle progress
+- separate writer and executor
+
 ## 0.0.2 (2024-06-21)
 
 ### Feat
