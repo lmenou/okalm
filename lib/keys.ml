@@ -29,10 +29,10 @@ let aes_decrypt_key to_decrypt key iv =
   Private aest#get_string
 
 module Crypt : sig
-  val encrypt : string -> private_key -> string -> string
+  val encrypt : string -> private_key -> string -> Cryptokit.AEAD.direction -> string
 end = struct
-  let encrypt content key iv =
-    let aest = Cryptokit.AEAD.aes_gcm ~iv (private_key_to_string key) Encrypt in
+  let encrypt content key iv direction =
+    let aest = Cryptokit.AEAD.aes_gcm ~iv (private_key_to_string key) direction in
     let _ = aest#put_string content in
     let _ = aest#finish_and_get_tag in
     aest#get_string

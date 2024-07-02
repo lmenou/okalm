@@ -27,7 +27,8 @@ val aes_decrypt_key : string -> private_key -> string -> private_key
 module Crypt : sig
   (** Encrypt with keys *)
 
-  val encrypt : string -> private_key -> string -> string
+  val encrypt :
+    string -> private_key -> string -> Cryptokit.AEAD.direction -> string
   (** [encrypt content key iv] encrypt the [content] with the given
       [key] and initial vector [iv] *)
 end
