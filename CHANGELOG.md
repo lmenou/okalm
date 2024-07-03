@@ -1,3 +1,9 @@
+## 0.0.4 (2024-07-03)
+
+### Fix
+
+- handle encryption direction
+
 ## 0.0.3 (2024-07-01)
 
 ### Feat
