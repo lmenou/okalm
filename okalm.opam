@@ -12,7 +12,6 @@ depends: [
   "dune" {>= "3.15"}
   "cmdliner"
   "cryptokit"
-  "progress"
   "ocaml-lsp-server" {build}
   "ocamlformat" {build}
   "utop" {build}
