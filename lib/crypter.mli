@@ -18,5 +18,5 @@ along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 (** Define the type for password management on the command line *)
 type opt = Change | Verify | VerifyAndEncrypt
 
-val crypter : opt -> string -> unit
+val crypter : opt -> string option -> unit
 (** Define the main function. *)

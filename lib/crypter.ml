@@ -60,14 +60,39 @@ let crypter passoption file =
       "Warning: the CLI is not tested on Windows, you may experience violent\n\
        bugs; hence aborting cowardly.\n"
   else if not (Store.exist "iv") then
-    let k1, iv = setup () in
-    Encwrite.crypt file k1 iv
+    match passoption with
+    | Verify ->
+        Printf.eprintf "%s"
+          "Problem: Cannot verify your password, store is empty!\n\
+           Stopping here.\n"
+    | Change ->
+        Printf.eprintf "%s"
+          "Problem: Cannot change your password, store is empty!\n\
+           Stopping here.\n"
+    | VerifyAndEncrypt -> (
+        match file with
+        | Some value ->
+            let k1, iv = setup () in
+            Encwrite.crypt value k1 iv
+        | None -> print_endline "not implemented yet")
   else
     match passoption with
-    | Verify -> print_endline "not implemented"
-    | Change -> print_endline "not implemented"
-    | VerifyAndEncrypt -> (
+    | Verify -> (
         try
-          let k1, iv = decryption () in
-          Encwrite.crypt file k1 iv
+          ignore (decryption ());
+          print_endline "Everything is fine!"
         with Exn.OkalmExn value -> print_endline value)
+    | Change -> (
+        match file with
+        | Some value ->
+            let k1, iv = setup () in
+            Encwrite.crypt value k1 iv
+        | None -> print_endline "not implemented yet")
+    | VerifyAndEncrypt -> (
+        match file with
+        | Some value -> (
+            try
+              let k1, iv = decryption () in
+              Encwrite.crypt value k1 iv
+            with Exn.OkalmExn value -> print_endline value)
+        | None -> print_endline "not implemented")
