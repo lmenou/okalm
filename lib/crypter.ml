@@ -59,7 +59,7 @@ let crypter passoption file =
     Printf.eprintf "%s"
       "Warning: the CLI is not tested on Windows, you may experience violent\n\
        bugs; hence aborting cowardly.\n"
-  else if not (Store.exist "iv") then
+  else if not Store.filled then
     match passoption with
     | Verify ->
         Printf.eprintf "%s"

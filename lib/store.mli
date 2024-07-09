@@ -27,3 +27,6 @@ val exist : string -> bool
 val unstore : string -> string
 (** [unstore filename] reads the content of a file named [filename] in
     okalm's store and returns it. *)
+
+val filled : bool
+(** [true] if store is filled [false] otherwise *)
