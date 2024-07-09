@@ -1,17 +1,19 @@
 (* Copyright (C) 2024 okalm author(s)
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
+
+type opt = Change | Verify | VerifyAndEncrypt
 
 (** Generate and store keys *)
 let setup () =
@@ -52,7 +54,7 @@ let decryption () =
     in
     raise (Exn.OkalmExn "Could not decrypt the first key for file decryption.")
 
-let crypter file =
+let crypter passoption file =
   if Sys.win32 || Sys.cygwin then
     Printf.eprintf "%s"
       "Warning: the CLI is not tested on Windows, you may experience violent\n\
@@ -61,7 +63,11 @@ let crypter file =
     let k1, iv = setup () in
     Encwrite.crypt file k1 iv
   else
-    try
-      let k1, iv = decryption () in
-      Encwrite.crypt file k1 iv
-    with Exn.OkalmExn value -> print_endline value
+    match passoption with
+    | Verify -> print_endline "not implemented"
+    | Change -> print_endline "not implemented"
+    | VerifyAndEncrypt -> (
+        try
+          let k1, iv = decryption () in
+          Encwrite.crypt file k1 iv
+        with Exn.OkalmExn value -> print_endline value)

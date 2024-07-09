@@ -15,5 +15,8 @@ along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 
 (** Define the entrypoint for the Okalm lib. *)
 
-val crypter : string -> unit
+(** Define the type for password management on the command line *)
+type opt = Change | Verify | VerifyAndEncrypt
+
+val crypter : opt -> string -> unit
 (** Define the main function. *)
