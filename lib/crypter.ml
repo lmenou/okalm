@@ -74,7 +74,7 @@ let crypter passoption file =
         | Some value ->
             let k1, iv = setup () in
             Encwrite.crypt value k1 iv
-        | None -> print_endline "not implemented yet")
+        | None -> ignore (setup ()))
   else
     match passoption with
     | Verify -> (
@@ -87,7 +87,7 @@ let crypter passoption file =
         | Some value ->
             let k1, iv = setup () in
             Encwrite.crypt value k1 iv
-        | None -> print_endline "not implemented yet")
+        | None -> ignore (setup ()))
     | VerifyAndEncrypt -> (
         match file with
         | Some value -> (
@@ -95,4 +95,6 @@ let crypter passoption file =
               let k1, iv = decryption () in
               Encwrite.crypt value k1 iv
             with Exn.OkalmExn value -> print_endline value)
-        | None -> print_endline "not implemented")
+        | None ->
+            Printf.eprintf "%s"
+              "Problem: Empty required file!\nStopping here.\n")
