@@ -1,3 +1,12 @@
+## 0.0.5 (2024-07-10)
+
+### Feat
+
+- handle properly option (so it seems)
+- create stored filled value
+- manage option with password
+- introduce password option
+
 ## 0.0.4 (2024-07-03)
 
 ### Fix
