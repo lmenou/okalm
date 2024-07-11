@@ -15,6 +15,12 @@
 
 type opt = Change | Verify | VerifyAndEncrypt
 
+let pp_error s =
+  let color = "#C40202" in
+  let seq = color |> Colors.make |> Colors.set_tty_color in
+  let prelude = seq ^ "Problem:" ^ Colors.reset_tty () in
+  Printf.eprintf "%s" (prelude ^ " " ^ s)
+
 (** Generate and store keys *)
 let setup () =
   let pass = Pass.getpass ~prompt_message:"Please enter your password:" in
@@ -95,6 +101,4 @@ let crypter passoption file =
               let k1, iv = decryption () in
               Encwrite.crypt value k1 iv
             with Exn.OkalmExn value -> print_endline value)
-        | None ->
-            Printf.eprintf "%s"
-              "Problem: Empty required file!\nStopping here.\n")
+        | None -> pp_error "Empty required file!\nStopping here.\n")
