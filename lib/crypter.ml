@@ -16,18 +16,16 @@
 type opt = Change | Verify | VerifyAndEncrypt
 
 let pp_error s =
-  let color = "#C40202" in
-  let seq = color |> Colors.make |> Colors.set_tty_color in
-  let prelude = seq ^ "Problem:" ^ Colors.reset_tty () in
-  Printf.eprintf "%s" (prelude ^ " " ^ s)
+  let problem = Tty.Color.write_with (`RGB "#C6200D") "Problem:" in
+  Printf.eprintf "%s" (problem ^ " " ^ s)
 
 (** Generate and store keys *)
 let setup () =
-  let pass = Pass.getpass ~prompt_message:"Please enter your password:" in
+  let pass = Tty.Pass.getpass ~prompt_message:"Please enter your password:" in
   let salt = Rgen.random_string 32 in
   let iv = Rgen.random_string 32 in
   let encrypted_password =
-    Okcrypt.Pbkdf.pbkdf2 ~salt (Pass.string_of_password pass)
+    Okcrypt.Pbkdf.pbkdf2 ~salt (Tty.Pass.string_of_password pass)
   in
   let k2, k3 = Keys.gen encrypted_password in
   let k1 = Keys.rand 32 in
@@ -39,11 +37,11 @@ let setup () =
 
 (** Decrypt keys from the storage *)
 let decryption () =
-  let pass = Pass.getpass ~prompt_message:"Please enter your password:" in
+  let pass = Tty.Pass.getpass ~prompt_message:"Please enter your password:" in
   let salt = Store.unstore "salt" in
   let iv = Store.unstore "iv" in
   let encrypted_password =
-    Okcrypt.Pbkdf.pbkdf2 ~salt (Pass.string_of_password pass)
+    Okcrypt.Pbkdf.pbkdf2 ~salt (Tty.Pass.string_of_password pass)
   in
   let k2, k3 = Keys.gen encrypted_password in
   let k3s = Store.unstore "k3" in
@@ -60,13 +58,13 @@ let decryption () =
     in
     raise (Exn.OkalmExn "Could not decrypt the first key for file decryption.")
 
-let crypter passoption file =
+let crypter pass file =
   if Sys.win32 || Sys.cygwin then
     Printf.eprintf "%s"
       "Warning: the CLI is not tested on Windows, you may experience violent\n\
        bugs; hence aborting cowardly.\n"
   else if not Store.filled then
-    match passoption with
+    match pass with
     | Verify ->
         Printf.eprintf "%s"
           "Problem: Cannot verify your password, store is empty!\n\
@@ -82,7 +80,7 @@ let crypter passoption file =
             Encwrite.crypt value k1 iv
         | None -> ignore (setup ()))
   else
-    match passoption with
+    match pass with
     | Verify -> (
         try
           ignore (decryption ());
