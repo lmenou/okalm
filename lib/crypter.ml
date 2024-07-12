@@ -15,9 +15,20 @@
 
 type opt = Change | Verify | VerifyAndEncrypt
 
-let pp_error s =
-  let problem = Tty.Color.write_with (`RGB "#C6200D") "Problem:" in
-  Printf.eprintf "%s" (problem ^ " " ^ s)
+let pp_error main explain =
+  let okalm =
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`RGB "#FF9F21") "okalm: "
+  in
+  let usage =
+    "\n\
+     Usage: okalm [--change] [--verify-and-encrypt] [--verify] [FILE]\n\n\
+     Try 'okalm --help' for more information.\n"
+  in
+  let main =
+    Tty.Style.write_with ~sty:[ Tty.Style.Underline ] (`RGB "#EE0019")
+      (main ^ ":")
+  in
+  Printf.eprintf "%s" (okalm ^ main ^ " " ^ explain ^ usage)
 
 (** Generate and store keys *)
 let setup () =
@@ -99,4 +110,5 @@ let crypter pass file =
               let k1, iv = decryption () in
               Encwrite.crypt value k1 iv
             with Exn.OkalmExn value -> print_endline value)
-        | None -> pp_error "Empty required file!\nStopping here.\n")
+        | None -> pp_error "FILE argument" "Empty required file! Stopping here."
+        )
