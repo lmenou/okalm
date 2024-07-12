@@ -34,6 +34,5 @@ module Crypt = struct
     let res =
       Okalm.Keys.Crypt.encrypt "content" k1 "coconut" Cryptokit.AEAD.Encrypt
     in
-    A.(check string)
-      "is a string" "\232>O\210\165k\028" res
+    A.(check string) "is a string" "\232>O\210\165k\028" res
 end

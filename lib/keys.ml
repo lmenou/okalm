@@ -1,17 +1,17 @@
 (* Copyright (C) 2024 okalm author(s)
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 
 (** Define utilities to work with keys *)
 
@@ -44,10 +44,13 @@ let aes_decrypt_key to_decrypt key iv =
   Private aest#get_string
 
 module Crypt : sig
-  val encrypt : string -> private_key -> string -> Cryptokit.AEAD.direction -> string
+  val encrypt :
+    string -> private_key -> string -> Cryptokit.AEAD.direction -> string
 end = struct
   let encrypt content key iv direction =
-    let aest = Cryptokit.AEAD.aes_gcm ~iv (private_key_to_string key) direction in
+    let aest =
+      Cryptokit.AEAD.aes_gcm ~iv (private_key_to_string key) direction
+    in
     let _ = aest#put_string content in
     let _ = aest#finish_and_get_tag in
     aest#get_string
