@@ -1,3 +1,15 @@
+## 0.0.6 (2024-07-12)
+
+### Feat
+
+- finish colorizing CLI
+- add effects on style
+- manipulate tty for colors
+
+### Refactor
+
+- create a tty module instead
+
 ## 0.0.5 (2024-07-10)
 
 ### Feat
