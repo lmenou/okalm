@@ -47,8 +47,18 @@ module Pass = struct
   let string_of_password = function Password pass -> pass
 end
 
-module Color = struct
+module Style = struct
   type color = RGB of int * int * int | ANSI256 of int
+  type effect = Bold | Italic | Underline
+
+  let effect_code sty =
+    let representation = function
+      | Bold -> "1"
+      | Italic -> "3"
+      | Underline -> "4"
+    in
+    let res = List.map representation sty in
+    String.concat ";" res
 
   (** The escape_tty_code to write color. *)
   let escape_tty_code = "\x1b[0m"
@@ -74,10 +84,14 @@ module Color = struct
         if value < 256 then ANSI256 value
         else raise (Exn.OkalmExn (string_of_int value ^ "is an invalid color."))
 
-  let write_with color s =
+  let write_with ?(sty = []) color s =
+    let effect = effect_code sty in
     let col = make color in
     match col with
     | RGB (r, g, b) ->
-        Format.sprintf "\x1b[38;2;%d;%d;%dm" r g b ^ s ^ escape_tty_code
-    | ANSI256 c -> Format.sprintf "\x1b[38;5;%dm" c ^ s ^ escape_tty_code
+        let style = Format.sprintf "\x1b[38;2;%d;%d;%d;%sm" r g b effect in
+        style ^ s ^ escape_tty_code
+    | ANSI256 c ->
+        let style = Format.sprintf "\x1b[38;5;%d%sm" c effect in
+        style ^ s ^ escape_tty_code
 end

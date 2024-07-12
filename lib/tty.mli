@@ -29,10 +29,22 @@ module Pass : sig
   (** Return the string of the password. *)
 end
 
-module Color : sig
+module Style : sig
   (** Define utility to deal with colors on the tty. *)
 
-  val write_with : [< `ANSI256 of int | `RGB of string ] -> string -> string
-  (** [write_with (`ANSI256 12) "my string"] return ["my string"] with the proper escaped sequence to print it in blue. 
-   [write_with (`RGB #161BA6) "my string"] is the same with true colors. *)
+  type effect =
+    | Bold
+    | Italic
+    | Underline  (** Define the type for the effect style on font. *)
+
+  val write_with :
+    ?sty:effect list ->
+    [< `ANSI256 of int | `RGB of string ] ->
+    string ->
+    string
+  (** [write_with (`ANSI256 12) "my string"] return ["my string"] with the proper escaped sequence to print it in blue.
+
+   [write_with (`RGB #161BA6) "my string"] is the same with true colors.
+
+   [write_with ~sty:[ Bold; Italic ] (`RGB #161BA6) "my string"] add bold and italic effect with the blue color. *)
 end
