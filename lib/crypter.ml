@@ -30,6 +30,17 @@ let pp_error main explain =
   in
   Printf.eprintf "%s" (okalm ^ main ^ " " ^ explain ^ usage)
 
+let pp_success main explain =
+  let okalm =
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`RGB "#FF9F21") "okalm: "
+  in
+  let main =
+    Tty.Style.write_with
+      ~sty:[ Tty.Style.Bold; Tty.Style.Italic ]
+      (`RGB "#00B40B") (main ^ ":")
+  in
+  Printf.printf "%s" (okalm ^ main ^ " " ^ explain ^ "\n")
+
 (** Generate and store keys *)
 let setup () =
   let pass = Tty.Pass.getpass ~prompt_message:"Please enter your password:" in
@@ -61,29 +72,22 @@ let decryption () =
     let k1 = Keys.aes_decrypt_key k1e k2 iv in
     (k1, iv)
   else
-    let _ =
-      Printf.eprintf "%s"
-        "Problem: Your password may be wrong or someone tampered with your \
-         files!\n\
-         Stopping here.\n"
-    in
-    raise (Exn.OkalmExn "Could not decrypt the first key for file decryption.")
+    raise
+      (Exn.OkalmExn
+         "Could not decrypt the first key for file decryption.\n\n\
+          Either password is wrong or someone tampered with your files!\n")
 
 let crypter pass file =
   if Sys.win32 || Sys.cygwin then
-    Printf.eprintf "%s"
-      "Warning: the CLI is not tested on Windows, you may experience violent\n\
-       bugs; hence aborting cowardly.\n"
+    pp_error "OS error"
+      "the CLI is not tested on Windows, you may experience violent bugs;\n\
+       hence aborting cowardly.\n"
   else if not Store.filled then
     match pass with
     | Verify ->
-        Printf.eprintf "%s"
-          "Problem: Cannot verify your password, store is empty!\n\
-           Stopping here.\n"
+        pp_error "PASSWORD option" "Password not registered! Cannot verify it!"
     | Change ->
-        Printf.eprintf "%s"
-          "Problem: Cannot change your password, store is empty!\n\
-           Stopping here.\n"
+        pp_error "PASSWORD option" "Password not registered! Cannot change it!"
     | VerifyAndEncrypt -> (
         match file with
         | Some value ->
@@ -95,8 +99,8 @@ let crypter pass file =
     | Verify -> (
         try
           ignore (decryption ());
-          print_endline "Everything is fine!"
-        with Exn.OkalmExn value -> print_endline value)
+          pp_success "PASSWORD verification" "everything ok!"
+        with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
     | Change -> (
         match file with
         | Some value ->
@@ -109,6 +113,6 @@ let crypter pass file =
             try
               let k1, iv = decryption () in
               Encwrite.crypt value k1 iv
-            with Exn.OkalmExn value -> print_endline value)
+            with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
         | None -> pp_error "FILE argument" "Empty required file! Stopping here."
         )
