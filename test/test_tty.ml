@@ -13,7 +13,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 
-(** Define utilities to generate random string. *)
-
-val random_string : int -> string
-(** [random_string 32] generate a random ASCII string of 256 bits. *)
+module Style = struct
+  let test_write_with () =
+    Alcotest.(check string)
+      "same string" "\027[38;2;0;0;0;mcoucou\027[0m"
+      (Okalm.Tty.Style.write_with (`RGB "#000") "coucou")
+end

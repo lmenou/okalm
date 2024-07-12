@@ -13,7 +13,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 
-(** Define utilities to generate random string. *)
-
-val random_string : int -> string
-(** [random_string 32] generate a random ASCII string of 256 bits. *)
+let test_rgen () =
+  Alcotest.(check int)
+    "same int" 32
+    (String.length (Okalm.Rgen.random_string 32))
