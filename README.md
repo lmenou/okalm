@@ -40,15 +40,15 @@ Here is the basic setup for the encryption.
     └── okcrypt # Tests for Okcrypt library
 ```
 
-### Disclaimer :rotating_light:
+## Disclaimer :rotating_light:
 
 Doesn't work on Windows, I don't own a Windows machine, hence I couldn't test it on the OS.
 
-### LICENSE :memo:
+## LICENSE :memo:
 
 Licensed under the GNU-GPLv3.
 
-### Contributions
+## Contributions
 
 Feel free to open an issue or a pull request if you have an idea to further
 enhance the toy project.
