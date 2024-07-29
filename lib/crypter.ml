@@ -77,42 +77,45 @@ let decryption () =
          "Could not decrypt the first key for file decryption.\n\n\
           Either password is wrong or someone tampered with your files!\n")
 
+let first_run pass file =
+  match pass with
+  | Verify ->
+      pp_error "PASSWORD option" "Password not registered! Cannot verify it!"
+  | Change ->
+      pp_error "PASSWORD option" "Password not registered! Cannot change it!"
+  | VerifyAndEncrypt -> (
+      match file with
+      | Some value ->
+          let k1, iv = setup () in
+          Encwrite.crypt value k1 iv
+      | None -> ignore (setup ()))
+
+let run pass file =
+  match pass with
+  | Verify -> (
+      try
+        ignore (decryption ());
+        pp_success "PASSWORD verification" "everything ok!"
+      with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
+  | Change -> (
+      match file with
+      | Some value ->
+          let k1, iv = setup () in
+          Encwrite.crypt value k1 iv
+      | None -> ignore (setup ()))
+  | VerifyAndEncrypt -> (
+      match file with
+      | Some value -> (
+          try
+            let k1, iv = decryption () in
+            Encwrite.crypt value k1 iv
+          with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
+      | None -> pp_error "FILE argument" "Empty required file! Stopping here.")
+
 let crypter pass file =
   if Sys.win32 || Sys.cygwin then
     pp_error "OS error"
       "the CLI is not tested on Windows, you may experience violent bugs;\n\
        hence aborting cowardly.\n"
-  else if not Store.filled then
-    match pass with
-    | Verify ->
-        pp_error "PASSWORD option" "Password not registered! Cannot verify it!"
-    | Change ->
-        pp_error "PASSWORD option" "Password not registered! Cannot change it!"
-    | VerifyAndEncrypt -> (
-        match file with
-        | Some value ->
-            let k1, iv = setup () in
-            Encwrite.crypt value k1 iv
-        | None -> ignore (setup ()))
-  else
-    match pass with
-    | Verify -> (
-        try
-          ignore (decryption ());
-          pp_success "PASSWORD verification" "everything ok!"
-        with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
-    | Change -> (
-        match file with
-        | Some value ->
-            let k1, iv = setup () in
-            Encwrite.crypt value k1 iv
-        | None -> ignore (setup ()))
-    | VerifyAndEncrypt -> (
-        match file with
-        | Some value -> (
-            try
-              let k1, iv = decryption () in
-              Encwrite.crypt value k1 iv
-            with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
-        | None -> pp_error "FILE argument" "Empty required file! Stopping here."
-        )
+  else if not Store.filled then first_run pass file
+  else run pass file
