@@ -15,8 +15,8 @@
 
 (package
  (name okalm)
- (synopsis "Encrypt your files, the ML way.")
- (description "A cli to encrypt your files.")
+ (synopsis "Encrypt your files, the ML way")
+ (description "A command line tool to encrypt your files.")
  (tags (crypto cli))
  (depends
    ocaml
