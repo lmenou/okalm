@@ -1,3 +1,15 @@
+## 0.0.7 (2024-08-12)
+
+### Feat
+
+- refactor command line use
+- modularize functions
+
+### Fix
+
+- correct typo
+- discard pass module
+
 ## 0.0.6 (2024-07-12)
 
 ### Feat
