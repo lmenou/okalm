@@ -15,39 +15,71 @@
 
 open Cmdliner
 
-let file = Arg.(value & pos 0 (some file) None & info [] ~docv:"FILE")
-
-let checkpass =
-  let change =
-    let doc = "Change your password." in
-    (Okalm.Crypter.Change, Arg.info [ "c"; "change" ] ~doc)
+let pass =
+  let option =
+    let verify =
+      let doc =
+        "($(b,DEFAULT)) Verify the encrypted password for the encryption. You \
+         must run the command with the option $(b,--init) at least once on \
+         first use."
+      in
+      (Okalm.Crypter.Verify, Arg.info [ "verify" ] ~doc)
+    in
+    let init =
+      let doc =
+        "Initialize and store the encrypted password for the encryption. You \
+         must run the command at least once on first use."
+      in
+      (Okalm.Crypter.Initiate, Arg.info [ "init" ] ~doc)
+    in
+    let change =
+      let doc =
+        "Change and store the encrypted password for the encryption. You must \
+         run the command with the option $(b,--init) at least once on first \
+         use."
+      in
+      (Okalm.Crypter.Change, Arg.info [ "change" ] ~doc)
+    in
+    Arg.(value & vflag Okalm.Crypter.Verify [ verify; init; change ])
   in
-  let verify =
-    let doc = "Simply check your password." in
-    (Okalm.Crypter.Verify, Arg.info [ "v"; "verify" ] ~doc)
-  in
-  let verify_and_encrypt =
-    let doc = "Check your password and encrypt the given file (default)." in
-    (Okalm.Crypter.VerifyAndEncrypt, Arg.info [ "e"; "verify-and-encrypt" ] ~doc)
-  in
-  Arg.(
-    last
-    & vflag_all
-        [ Okalm.Crypter.VerifyAndEncrypt ]
-        [ change; verify; verify_and_encrypt ])
-
-let cmd =
-  let doc = "Encrypt files" in
+  let doc = "Manage password in the broad sense." in
   let man =
     [
       `S Manpage.s_description;
       `P
-        "$(tname) encrypt each specified $(i,FILE). It does not\n\
+        "Manage password, to change it or to verify it. Options are mutually \
+         exclusive.";
+    ]
+  in
+  let info = Cmd.info "pass" ~doc ~man in
+  Cmd.v info Term.(map Okalm.Crypter.pass option)
+
+let encrypt =
+  let file =
+    let doc = "The file to encrypt." in
+    Arg.(required & pos 0 (some file) None & info [] ~doc ~docv:"FILE")
+  in
+  let doc = "Encrypt the provided file." in
+  let man =
+    [
+      `S Manpage.s_description;
+      `P "Encrypt the provided file. Only pure text files are managed so far.";
+    ]
+  in
+  let info = Cmd.info "encrypt" ~doc ~man in
+  Cmd.v info Term.(const Okalm.Crypter.encrypt $ file)
+
+let cmd =
+  let doc = "Encrypt files, on the command line the ML way." in
+  let man =
+    [
+      `S Manpage.s_description;
+      `P
+        "$(tname) encrypt the specified $(i,FILE). It does not\n\
          encrypt directories, (yet?).";
     ]
   in
   let info = Cmd.info "okalm" ~version:"%%VERSION%%" ~doc ~man in
-  Cmd.v info Term.(const Okalm.Crypter.crypter $ checkpass $ file)
+  Cmd.group info [ pass; encrypt ]
 
-let main () = exit (Cmd.eval cmd)
-let () = main ()
+let () = exit (Cmd.eval cmd)

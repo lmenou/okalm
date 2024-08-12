@@ -15,8 +15,10 @@
 
 (** Define the entrypoint for the Okalm lib. *)
 
-(** Define the type for password management on the command line *)
-type opt = Change | Verify | VerifyAndEncrypt
 
-val crypter : opt -> string option -> unit
-(** Define the main function. *)
+(** Define the type for password management on the command line *)
+type passopt = Verify | Change | Initiate
+
+val pass : passopt -> unit
+
+val encrypt : string -> unit

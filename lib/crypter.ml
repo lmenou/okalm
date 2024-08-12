@@ -13,33 +13,28 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see {:https://www.gnu.org/licenses/}. *)
 
-type opt = Change | Verify | VerifyAndEncrypt
-
 let pp_error main explain =
   let okalm =
-    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`RGB "#FF9F21") "okalm: "
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 1) "okalm: "
   in
-  let usage =
-    "\n\
-     Usage: okalm [--change] [--verify-and-encrypt] [--verify] [FILE]\n\n\
-     Try 'okalm --help' for more information.\n"
-  in
+  let usage = "\nTry 'okalm --help' for more information.\n" in
   let main =
-    Tty.Style.write_with ~sty:[ Tty.Style.Underline ] (`RGB "#EE0019")
-      (main ^ ":")
+    Tty.Style.write_with ~sty:[ Tty.Style.Underline ] (`ANSI256 0) (main ^ ":")
   in
   Printf.eprintf "%s" (okalm ^ main ^ " " ^ explain ^ usage)
 
 let pp_success main explain =
   let okalm =
-    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`RGB "#FF9F21") "okalm: "
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 1) "okalm: "
   in
   let main =
     Tty.Style.write_with
       ~sty:[ Tty.Style.Bold; Tty.Style.Italic ]
-      (`RGB "#00B40B") (main ^ ":")
+      (`ANSI256 4) (main ^ ":")
   in
   Printf.printf "%s" (okalm ^ main ^ " " ^ explain ^ "\n")
+
+type passopt = Verify | Change | Initiate
 
 (** Generate and store keys *)
 let setup () =
@@ -77,45 +72,47 @@ let decryption () =
          "Could not decrypt the first key for file decryption.\n\n\
           Either password is wrong or someone tampered with your files!\n")
 
-let first_run pass file =
-  match pass with
-  | Verify ->
-      pp_error "PASSWORD option" "Password not registered! Cannot verify it!"
-  | Change ->
-      pp_error "PASSWORD option" "Password not registered! Cannot change it!"
-  | VerifyAndEncrypt -> (
-      match file with
-      | Some value ->
-          let k1, iv = setup () in
-          Encwrite.crypt value k1 iv
-      | None -> ignore (setup ()))
-
-let run pass file =
-  match pass with
+let pass option =
+  match option with
   | Verify -> (
-      try
-        ignore (decryption ());
-        pp_success "PASSWORD verification" "everything ok!"
-      with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
+      if not Store.filled then
+        let _ =
+          pp_error "PASSWORD command"
+            "cannot verify, on first run, use --init options."
+        in
+        ()
+      else
+        try
+          let _ = decryption () in
+          pp_success "PASSWORD verification" "everything ok!"
+        with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
   | Change -> (
-      match file with
-      | Some value ->
-          let k1, iv = setup () in
-          Encwrite.crypt value k1 iv
-      | None -> ignore (setup ()))
-  | VerifyAndEncrypt -> (
-      match file with
-      | Some value -> (
-          try
-            let k1, iv = decryption () in
-            Encwrite.crypt value k1 iv
-          with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
-      | None -> pp_error "FILE argument" "Empty required file! Stopping here.")
+      if not Store.filled then
+        let _ =
+          pp_error "PASSWORD command"
+            "cannot verify, on first run, use --init options."
+        in
+        ()
+      else
+        try
+          let _ = setup () in
+          pp_success "PASSWORD change" "change ok!"
+        with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
+  | Initiate -> (
+      if Store.filled then
+        let _ =
+          pp_error "PASSWORD command"
+            "cannot init, second run, use other options."
+        in
+        ()
+      else
+        try
+          let _ = setup () in
+          pp_success "PASSWORD command" "init ok!"
+        with Exn.OkalmExn value -> pp_error "PASSWORD error" value)
 
-let crypter pass file =
-  if Sys.win32 || Sys.cygwin then
-    pp_error "OS error"
-      "the CLI is not tested on Windows, you may experience violent bugs;\n\
-       hence aborting cowardly.\n"
-  else if not Store.filled then first_run pass file
-  else run pass file
+let encrypt file =
+  try
+    let k1, iv = decryption () in
+    Encwrite.crypt file k1 iv
+  with Exn.OkalmExn value -> pp_error "PASSWORD error" value
