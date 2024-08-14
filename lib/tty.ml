@@ -92,6 +92,6 @@ module Style = struct
         let style = Format.sprintf "\x1b[38;2;%d;%d;%d;%sm" r g b effect in
         style ^ s ^ escape_tty_code
     | ANSI256 c ->
-        let style = Format.sprintf "\x1b[38;5;%d%sm" c effect in
+        let style = Format.sprintf "\x1b[38;5;%d;%sm" c effect in
         style ^ s ^ escape_tty_code
 end
