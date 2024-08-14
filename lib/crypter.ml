@@ -15,17 +15,17 @@
 
 let pp_error main explain =
   let okalm =
-    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 1) "okalm: "
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 11) "okalm: "
   in
   let usage = "\nTry 'okalm --help' for more information.\n" in
   let main =
-    Tty.Style.write_with ~sty:[ Tty.Style.Underline ] (`ANSI256 0) (main ^ ":")
+    Tty.Style.write_with ~sty:[ Tty.Style.Underline ] (`ANSI256 1) (main ^ ":")
   in
   Printf.eprintf "%s" (okalm ^ main ^ " " ^ explain ^ usage)
 
 let pp_success main explain =
   let okalm =
-    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 1) "okalm: "
+    Tty.Style.write_with ~sty:[ Tty.Style.Bold ] (`ANSI256 11) "okalm: "
   in
   let main =
     Tty.Style.write_with
